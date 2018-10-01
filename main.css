@@ -143,6 +143,18 @@ animation: fadein 3s;
     -o-animation: fadein 3s; /* Opera */
 
 }
+
+#main_learn{
+    font-size: 13px;
+    grid-area: main;
+    display: grid;
+    padding-right: 10px;
+    grid-gap:10px;
+    padding-bottom: 20px;
+    grid-template-columns: 1fr;
+                
+grid-template-rows: auto;
+}
 #main>div>h3>span{
     color: var(--red);
 }
@@ -182,24 +194,26 @@ animation: fadein 3s;
 }
 
 
-#main>div>p{
+#main>div>p, #main_learn>div>p{
         padding: 5px;
         line-height: 1.5em;
-        text-align: justify;}
-#main>div>h3{
+        text-align: justify;
+}
+
+#main>div>h3, #main_learn>div>h3{
     color: var(--blue);
 }
 
-#main>div{
+#main>div, #last_article{
     justify-self: center;
     padding: 15px
 }
-#main>div>img, #main>div>a>img{
+#main>div>img, #main>div>a>img, #main_learn>div>img{
   max-width: 400px;
     height: auto
 }
 
-#main>div>p>a{
+#main>div>p>a, #main_learn>div>p>a{
 
     color: var(--blue);
     
