@@ -96,7 +96,7 @@ body{
   
 }
 
-#menu>span>a, #main>div>a>h4, #menu>nav>a, #main>div>a>h3{
+#menu>span>a, #main>div>a>h4, #menu>nav>a, #main_learn>div>a>h3{
     text-decoration: none;
     display: block;
     padding: 0;
@@ -345,12 +345,12 @@ input[type=checkbox]:checked ~ #menu{
         padding:0
     }
     
-    #main {
-    font-size: 13px;
+    #main, #main_learn {
+    font-size: 14px;
     grid-area: main;
     display: grid;
-        padding-left: 10px;
-        padding-right: 10px;
+        padding-left: 20px;
+        padding-right: 20px;
         justify-self:center;
         grid-template-columns: 
             repeat(auto-fill, 
