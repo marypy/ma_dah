@@ -151,9 +151,12 @@ animation: fadein 3s;
     grid-gap:10px;
     padding-bottom: 20px;
     grid-template-columns: 1fr;
-                
-grid-template-rows: auto;
+    grid-template-rows: auto;
 }
+  #main_learn>.article {
+  padding-right: 20px;
+}
+
 #main>div>h3>span{
     color: var(--red);
 }
