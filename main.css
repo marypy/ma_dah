@@ -154,6 +154,9 @@ animation: fadein 3s;
                 
 grid-template-rows: auto;
 }
+#main_learn>.article {
+  padding-left: 20px;
+}
 #main>div>h3>span{
     color: var(--red);
 }
