@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>D3: Drawing divs with data</title>
+		<script type="text/javascript" src="../d3.js"></script>
+		<style type="text/css">
+		
+		</style>
+	</head>
+	<body>
+		<script type="text/javascript">
+
+            var w = 800;
+            var h = 800;
+            
+            var dataset = [150, 126, 59, 30, 16, 9];
+            
+    
+            
+    var svg = d3.select("body")
+            .append('svg')
+            .attr("width", w)
+            .attr("height", h);
+            
+            
+    var circles = svg.selectAll("circle")
+            .data(dataset)
+            .enter()
+            .append("circle")
+           ;
+            
+    circles.attr("cx", function(d, i){
+            return (i*60) +250;
+    }) 
+            .attr("cy", function(d, i){
+            return (i*40) + 250;
+    })
+            .attr("r", function (d){
+            return d;
+    })
+            .style("fill", "orangered")
+            .attr("stroke", "pink")
+            .attr("stroke-width", function(d){
+            return d/4
+    })
+            ;
+          
+            
+		</script>
+	</body>
+</html>
