@@ -154,10 +154,10 @@ animation: fadein 3s;
                 
 grid-template-rows: auto;
 }
-#footnotes{
+#main_learn>#footnotes{
   font-size: 12px;
 }
-sup{
+#main_learn>sup{
   color:var(--blue);
   font-size:12px
 }
