@@ -154,6 +154,13 @@ animation: fadein 3s;
                 
 grid-template-rows: auto;
 }
+#footnotes{
+  font-size: 12px;
+}
+sup{
+  color:var(--blue);
+  font-size:12px
+}
 
 #main>div>h3>span{
     color: var(--red);
