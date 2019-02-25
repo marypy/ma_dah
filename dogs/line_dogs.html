@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style> /* set the CSS */
+
+body { font: 12px Arial;}
+
+path { 
+    stroke-width: 3;
+    fill: none;
+}
+p {
+    margin-left: 60px;
+    font-size: 14px;
+    
+        } 
+    #text{
+       margin: 40px;
+        font-size: 14px;
+        line-height: 1.5em
+    }
+    #next{
+        
+    margin-left: 750px
+    }
+
+.axis path,
+.axis line {
+    fill: none;
+    stroke: grey;
+    stroke-width: 1;
+    shape-rendering: crispEdges;
+}
+    
+div.tooltip {	
+    position: absolute;			
+    text-align: center;			
+    width: 60px;					
+    height: 40px;					
+    padding: 2px;				
+    font: 14px sans-serif;
+    line-height: 1.5em;
+    background: lightsteelblue;	
+    border: 0px;		
+    border-radius: 8px;			
+    pointer-events: none;			
+}
+
+    .title {
+    margin-top:0;
+    float:left;
+   
+}
+    .title>span{
+        font-size: 60px;
+        font-weight: 500;
+    }
+    h1{
+        color: steelblue;
+        margin-left: 60px;
+    }
+</style>
+
+<body>
+    <h1>Some statistics about Dogs' life and death in Cork (Ireland) of 21st century. </h1>
+    <p id ="text">
+        This data viz is based on the selected data from<a href = "https://data.gov.ie/dataset/dog-licensing" target = "blanc"> Irish Dog Control Statistics.</a> It was done as a part of the assignament for the 'Tools and Methodologies' module of the Digital Arts and Humanities MA. The aim is (in my understanding) both technical and analytical: we (students) were asked to develop a <em>storytelling</em> for our visualizations. My "story" is that of design, not just interpretation. To do this viz "manually" (with D3.js, with a help of on-line sources - as always) allowed me to engage with the data on a very concrete level, to guess its hidden statistical bias and potential insights.
+        While very far from my actual interests in Arts nad Humanities, this data (chosen quite randomelly) was eventually fairly interesting to work with. I keep the full <em>storytelling</em> for a lecturer and publish below the visual part. 
+        <br>     
+    </p>
+
+<!-- load the d3.js library -->    
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<div>
+    <p id = "next"><em>
+        Number of euthanized dogs (non-reclamed, non-rehomed)related to the number of strays
+        <br>in Cork County (without City).</em>
+    </div>
+<script>
+
+// Set the dimensions of the canvas / graph
+var margin = {top: 30, right: 20, bottom: 30, left: 60},
+    width = 600 - margin.left - margin.right,
+    height = 400 - margin.top - margin.bottom;
+
+// Parse the date / time
+var parseDate = d3.time.format("%Y").parse;
+
+// Set the ranges
+var x = d3.time.scale().range([0, width]);
+var y = d3.scale.linear().range([height, 0]);
+
+// Define the axes
+var xAxis = d3.svg.axis().scale(x)
+    .orient("bottom").ticks(12);
+
+var yAxis = d3.svg.axis().scale(y)
+    .orient("left").ticks(10);
+
+//define the tooltip's div
+var div = d3.select("body").append("div")	
+    .attr("class", "tooltip")				
+    .style("opacity", 0);
+    
+var formatTime = d3.time.format("%Y");
+
+// Define the population's line
+var populationline = d3.svg.line()
+    .x(function(d) { return x(d.date);})
+    .y(function(d) { return y(d.population); });
+    
+// Define the dogs' line
+var dogsline = d3.svg.line()
+    .x(function(d) { return x(d.date);})
+    .y(function(d) { return y(d.dogs); });
+    
+// Adds the svg canvas
+var chart1 = d3.select("body")
+    .append("svg")
+        .attr("width", width + margin.left +100 + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", 
+              "translate(" + margin.left + "," + margin.top + ")");
+
+
+// Get the data
+d3.csv("data.csv", function(error, data) {
+    data.forEach(function(d) {
+        d.date = parseDate(d.date);
+        d.population = +d.population;
+        d.dogs = +d.dogs;
+    });
+
+    // Scale the range of the data
+    x.domain(d3.extent(data, function(d) { return d.date; }));
+    y.domain([0, d3.max(data, function(d) { return d.population; })]);
+
+    // Add the populationline path.
+    chart1.append("path")
+        .attr("class", "line")
+        .attr("d", populationline(data))
+        .attr("stroke", "red");
+    
+    // Add the dogsline path.
+   chart1.append("path")
+        .attr("class", "line")
+        .attr("d", dogsline(data))
+        .attr("stroke", "steelblue");
+    
+    // Add the tooltip
+    chart1.selectAll("dot")	
+        .data(data)			
+    .enter().append("circle")								
+        .attr("r", 5)
+        .style("fill", "red")
+        .attr("cx", function(d) { return x(d.date); })		 
+        .attr("cy", function(d) { return y(d.population); })		
+        .on("mouseover", function(d) {		
+            div.transition()		
+                .duration(200)		
+                .style("opacity", .9);		
+            div	.html(formatTime(d.date) + "<br/>"  + d.population)	
+                .style("left", (d3.event.pageX) + "px")		
+                .style("top", (d3.event.pageY - 28) + "px");	
+            })					
+        .on("mouseout", function(d) {		
+            div.transition()		
+                .duration(500)		
+                .style("opacity", 0);	
+        });
+    chart1.selectAll("dot")	
+        .data(data)			
+    .enter().append("circle")								
+        .attr("r", 5)
+        .style("fill", "steelblue")
+        .attr("cx", function(d) { return x(d.date); })		 
+        .attr("cy", function(d) { return y(d.dogs); })		
+        .on("mouseover", function(d) {		
+            div.transition()		
+                .duration(200)		
+                .style("opacity", .9);		
+            div	.html(formatTime(d.date) + "<br/>"  + d.dogs)	
+                .style("left", (d3.event.pageX) + "px")		
+                .style("top", (d3.event.pageY - 28) + "px");	
+            })					
+        .on("mouseout", function(d) {		
+            div.transition()		
+                .duration(500)		
+                .style("opacity", 0);	
+        });
+    
+
+    // Add the X Axis
+    chart1.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis);
+
+    // Add the Y Axis
+   chart1.append("g")
+        .attr("class", "y axis")
+        .call(yAxis);
+
+});
+
+// Adds the svg canvas
+var chart2 = d3.select("body")
+    .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+        .attr("transform", 
+              "translate(" + margin.left + "," + margin.top + ")");
+
+// Get the data
+d3.csv("data.csv", function(error, data) {
+    data.forEach(function(d) {
+        d.date = parseDate(d.date);
+        d.strays = +d.strays;
+        d.euthanazed = +d.euthanazed;
+    });
+
+    // Scale the range of the data
+    x.domain(d3.extent(data, function(d) { return d.date; }));
+    y.domain([0, d3.max(data, function(d) { return d.strays; })]);
+
+var straysline = d3.svg.line()
+    .x(function(d) { return x(d.date);})
+    .y(function(d) { return y(d.strays); });
+    
+var euthanazedline = d3.svg.line()
+    .x(function(d) { return x(d.date);})
+    .y(function(d) { return y(d.euthanazed); });
+        
+    // Add the populationline path.
+    chart2.append("path")
+        .attr("class", "line")
+        .attr("d", straysline(data))
+        .attr("stroke", "lightblue");
+    
+    // Add the dogsline path.
+    chart2.append("path")
+        .attr("class", "line")
+        .attr("d", euthanazedline(data))
+        .attr("stroke", "black");
+    
+    //Add dots/tooltip
+    chart2.selectAll("dot")	
+    .data(data)			
+    .enter().append("circle")								
+        .attr("r", 5)
+        .style("fill", "lightblue")
+        .attr("cx", function(d) { return x(d.date); })		 
+        .attr("cy", function(d) { return y(d.strays); })		
+        .on("mouseover", function(d) {		
+            div.transition()		
+                .duration(200)		
+                .style("opacity", .9);		
+            div	.html(formatTime(d.date) + "<br/>"  + d.strays)	
+                .style("left", (d3.event.pageX) + "px")		
+                .style("top", (d3.event.pageY - 28) + "px");	
+            })					
+        .on("mouseout", function(d) {		
+            div.transition()		
+                .duration(500)		
+                .style("opacity", 0);	
+        });
+    
+     chart2.selectAll("dot")	
+    .data(data)			
+    .enter().append("circle")								
+        .attr("r", 5)
+        .style("fill", "black")
+        .attr("cx", function(d) { return x(d.date); })		 
+        .attr("cy", function(d) { return y(d.euthanazed); })		
+        .on("mouseover", function(d) {		
+            div.transition()		
+                .duration(200)		
+                .style("opacity", .9);		
+            div	.html(formatTime(d.date) + "<br/>"  + d.euthanazed)	
+                .style("left", (d3.event.pageX) + "px")		
+                .style("top", (d3.event.pageY - 28) + "px");	
+            })					
+        .on("mouseout", function(d) {		
+            div.transition()		
+                .duration(500)		
+                .style("opacity", 0);	
+        });
+
+    // Add the X Axis
+    chart2.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis);
+
+    // Add the Y Axis
+    chart2.append("g")
+        .attr("class", "y axis")
+        .call(yAxis);
+
+});
+
+    </script>     
+    <p><em>Number of dogs' licences related to general population in Cork County (without City), in thousands.</em>
+        </p>
+    <p class="title">
+        <span style="color: red">- </span>humans</p>
+        <p class="title"> <span style="color:steelblue">- </span>dogs</p>
+        <p class="title"><span style="color:lightblue">- </span>strays</p>
+        <p class="title"><span>-  </span>euthanized dogs</p> 
+    <br><br><br><br>
+   <p id="text">
+      The choice of separate representation (for Cork County and City) is dictated by the data itself (presented separately in the indicated source). I found it relevant to show separately urban and rural sides. The choice of parameters (humain versus dogs' population and stray's versus euthanized dogs number) was done with the intention to tease more clearly some tendencies. <br>
+    
+       Interesting detail (not appearing on the viz): the term <em>euthanized</em> is used since 2015: in 2004 we encounter the term <em>destroyed</em> (dogs) while between 2005 and 2014, it is replaced by <em>put to sleep</em>. This mutation of terminology is significant in itself as witnesses about some mutation of mentalities.<br>
+       I didn't find an official explanation for years 2006-2009 missing data and don't want to develop here further speculations, but I would like just to notice that the period is that, of the overheating and collapse of <em>Celtic Tiger's</em> model. In my further research I would like to scoop more on the phenomenon of data's availability and visibility (and its aesthetic and political aspects). 
+</p>
+    <div>
+    <p id = "next">
+        <em>Number of euthanized dogs (non-reclamed, non-rehomed)related to the number of strays
+        <br>in Cork City).</em>
+    </div>
+    
+<script>
+
+// Set the dimensions of the canvas / graph
+var margin = {top: 30, right: 20, bottom: 30, left: 60},
+    width = 600 - margin.left - margin.right,
+    height = 400 - margin.top - margin.bottom;
+
+// Parse the date / time
+var parseDate = d3.time.format("%Y").parse;
+
+// Set the ranges
+var x = d3.time.scale().range([0, width]);
+var y = d3.scale.linear().range([height, 0]);
+
+// Define the axes
+var xAxis = d3.svg.axis().scale(x)
+    .orient("bottom").ticks(12);
+
+var yAxis = d3.svg.axis().scale(y)
+    .orient("left").ticks(10);
+    
+
+// Define the population's line
+var populationline = d3.svg.line()
+    .x(function(d) { return x(d.date);})
+    .y(function(d) { return y(d.population); });
+    
+// Define the dogs' line
+var dogsline = d3.svg.line()
+    .x(function(d) { return x(d.date);})
+    .y(function(d) { return y(d.dogs); });
+    
+// Adds the svg canvas
+var chart3 = d3.select("body")
+    .append("svg")
+        .attr("width", width + margin.left +100 + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", 
+              "translate(" + margin.left + "," + margin.top + ")");
+
+
+// Get the data
+d3.csv("data2.csv", function(error, data) {
+    data.forEach(function(d) {
+        d.date = parseDate(d.date);
+        d.population = +d.population;
+        d.dogs = +d.dogs;
+    });
+
+    // Scale the range of the data
+    x.domain(d3.extent(data, function(d) { return d.date; }));
+    y.domain([0, d3.max(data, function(d) { return d.population; })]);
+
+    // Add the populationline path.
+    chart3.append("path")
+        .attr("class", "line")
+        .attr("d", populationline(data))
+        .attr("stroke", "red");
+    
+    // Add the dogsline path.
+   chart3.append("path")
+        .attr("class", "line")
+        .attr("d", dogsline(data))
+        .attr("stroke", "steelblue");
+    
+chart3.selectAll("dot")	
+        .data(data)			
+    .enter().append("circle")								
+        .attr("r", 5)
+        .style("fill", "red")
+        .attr("cx", function(d) { return x(d.date); })		 
+        .attr("cy", function(d) { return y(d.population); })		
+        .on("mouseover", function(d) {		
+            div.transition()		
+                .duration(200)		
+                .style("opacity", .9);		
+            div	.html(formatTime(d.date) + "<br/>"  + d.population)	
+                .style("left", (d3.event.pageX) + "px")		
+                .style("top", (d3.event.pageY - 28) + "px");	
+            })					
+        .on("mouseout", function(d) {		
+            div.transition()		
+                .duration(500)		
+                .style("opacity", 0);	
+        });
+    chart3.selectAll("dot")	
+        .data(data)			
+    .enter().append("circle")								
+        .attr("r", 5)
+        .style("fill", "steelblue")
+        .attr("cx", function(d) { return x(d.date); })		 
+        .attr("cy", function(d) { return y(d.dogs); })		
+        .on("mouseover", function(d) {		
+            div.transition()		
+                .duration(200)		
+                .style("opacity", .9);		
+            div	.html(formatTime(d.date) + "<br/>"  + d.dogs)	
+                .style("left", (d3.event.pageX) + "px")		
+                .style("top", (d3.event.pageY - 28) + "px");	
+            })					
+        .on("mouseout", function(d) {		
+            div.transition()		
+                .duration(500)		
+                .style("opacity", 0);	
+        });
+
+    // Add the X Axis
+    chart3.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis);
+
+    // Add the Y Axis
+   chart3.append("g")
+        .attr("class", "y axis")
+        .call(yAxis);
+
+});
+
+// Adds the svg canvas
+var chart4 = d3.select("body")
+    .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+        .attr("transform", 
+              "translate(" + margin.left + "," + margin.top + ")");
+
+// Get the data
+d3.csv("data2.csv", function(error, data) {
+    data.forEach(function(d) {
+        d.date = parseDate(d.date);
+        d.strays = +d.strays;
+        d.euthanazed = +d.euthanazed;
+    });
+
+    // Scale the range of the data
+    x.domain(d3.extent(data, function(d) { return d.date; }));
+    y.domain([0, d3.max(data, function(d) { return d.strays; })]);
+
+var straysline = d3.svg.line()
+    .x(function(d) { return x(d.date);})
+    .y(function(d) { return y(d.strays); });
+    
+var euthanazedline = d3.svg.line()
+    .x(function(d) { return x(d.date);})
+    .y(function(d) { return y(d.euthanazed); });
+        
+    // Add the strays line path.
+    chart4.append("path")
+        .attr("class", "line")
+        .attr("d", straysline(data))
+        .attr("stroke", "lightblue");
+    
+    // Add the euthanazed line path.
+    chart4.append("path")
+        .attr("class", "line")
+        .attr("d", euthanazedline(data))
+        .attr("stroke", "black");
+    
+    chart4.selectAll("dot")	
+    .data(data)			
+    .enter().append("circle")								
+        .attr("r", 5)
+        .style("fill", "lightblue")
+        .attr("cx", function(d) { return x(d.date); })		 
+        .attr("cy", function(d) { return y(d.strays); })		
+        .on("mouseover", function(d) {		
+            div.transition()		
+                .duration(200)		
+                .style("opacity", .9);		
+            div	.html(formatTime(d.date) + "<br/>"  + d.strays)	
+                .style("left", (d3.event.pageX) + "px")		
+                .style("top", (d3.event.pageY - 28) + "px");	
+            })					
+        .on("mouseout", function(d) {		
+            div.transition()		
+                .duration(500)		
+                .style("opacity", 0);	
+        });
+    
+     chart4.selectAll("dot")	
+    .data(data)			
+    .enter().append("circle")								
+        .attr("r", 5)
+        .style("fill", "black")
+        .attr("cx", function(d) { return x(d.date); })		 
+        .attr("cy", function(d) { return y(d.euthanazed); })		
+        .on("mouseover", function(d) {		
+            div.transition()		
+                .duration(200)		
+                .style("opacity", .9);		
+            div	.html(formatTime(d.date) + "<br/>"  + d.euthanazed)	
+                .style("left", (d3.event.pageX) + "px")		
+                .style("top", (d3.event.pageY - 28) + "px");	
+            })					
+        .on("mouseout", function(d) {		
+            div.transition()		
+                .duration(500)		
+                .style("opacity", 0);	
+        });
+
+    // Add the X Axis
+    chart4.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis);
+
+    // Add the Y Axis
+    chart4.append("g")
+        .attr("class", "y axis")
+        .call(yAxis);
+
+});
+
+    </script>
+    <p><em>Number of dogs' licences related to general population in Cork City, in thousands.</em>
+        </p>
+    <br><br><br><br>
+    
+ 
+</body>
