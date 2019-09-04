@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style> /* set the CSS */
+body { font: 12px Arial;}
+    
+p {
+    margin-left: 60px;
+    margin-right: 60px;
+    font-size: 1.2em;
+    line-height: 1.6em;
+    
+    
+        } 
+path { 
+    stroke-width: 1;
+    fill: none;
+}
+   
+.axis path,
+.axis line {
+    fill: none;
+    stroke: grey;
+    stroke-width: 1;
+    shape-rendering: crispEdges;
+}
+    
+div.tooltip {	
+    position: absolute;			
+    text-align: center;			
+    width: 60px;					
+    height: 40px;					
+    padding: 2px;	
+    font: 14px sans-serif;
+    background: sandybrown;
+    line-height: 1.5em;	
+    border: 0px;		
+    border-radius: 8px;			
+    pointer-events: none;			
+}
+    #tooltip_g{
+        background: lightsteelblue;
+    }
+    
+    h1{
+        
+        font-size: 1.5em;
+        margin-left: 60px;
+    }
+    .title {
+    margin-top:0;
+    float:left;
+   
+}
+    .title>span{
+        font-size: 60px;
+        font-weight: 500;
+    }
+  
+</style>
+
+<body>
+    <h1>The monthly frequency of titles about autism and mental/learning disability in Le Monde and The Guardian, between 2008 and mid-2019 </h1>
+    
+
+<!-- load the d3.js library -->    
+<script src="https://d3js.org/d3.v3.min.js"></script>
+<!-- <script type="text/javascript" src="d3.min.js"></script>
+<script type="text/javascript" src="d3.js"></script> -->
+
+<script>
+// Set the dimensions of the canvas / graph
+var margin = {top: 10, right: 10, bottom: 30, left: 30},
+    width = 1400 - margin.left - margin.right,
+    height = 700 - margin.top - margin.bottom;
+// Parse the date / time
+var parseDate = d3.time.format("%Y-%m").parse;
+// Set the ranges
+var x = d3.time.scale().range([0, width]);
+var y = d3.scale.linear().range([height, 0]);
+// Define the axes
+var xAxis = d3.svg.axis().scale(x)
+    .orient("bottom")
+    .ticks(d3.time.date,1)
+    .tickFormat(d3.time.format('%Y'))
+    .tickSubdivide(12);
+const yAxis = d3.svg.axis().scale(y)
+    .orient("left").ticks(23);
+//define the tooltip's div
+const div = d3.select("body").append("div")	
+    .attr("class", "tooltip")
+    .style("opacity", 0);  
+    
+const div_g = d3.select("body").append("div")	
+    .attr("class", "tooltip")
+    .attr("id", "tooltip_g")
+    .style("opacity", 0)
+    
+const formatTime = d3.time.format("%Y-%m");
+    
+// Define the lemonde line
+const lemondeline = d3.svg.line()
+    .x(function(d) { return x(d.date);})
+    .y(function(d) { return y(d.lemonde); });
+    
+// Define the theguardian line
+const theguardianline = d3.svg.line()
+    .x(function(d) { return x(d.date);})
+    .y(function(d) { return y(d.theguardian); });
+    
+// Adds the svg canvas
+var chart1 = d3.select("body")
+        .append("svg")
+        .attr("width", width + margin.left +100+ margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", 
+              "translate(" + margin.left + "," + margin.top + ")");
+    
+// Get the data
+d3.csv("data.csv", function(error, data) {
+    data.forEach(function(d) {
+        d.date = parseDate(d.date);
+        d.lemonde = +d.lemonde;
+        d.theguardian = +d.theguardian;
+    });
+    // Scale the range of the data
+    x.domain(d3.extent(data, function(d) { return d.date; }));
+    y.domain([0, d3.max(data, function(d) { return d.theguardian; })]);
+    
+    // Add the tooltip
+    chart1.selectAll("dot")	
+        .data(data)			
+    .enter().append("circle")								
+        .attr("r", 4)
+        .style("fill", "darkorange")
+        .attr("cx", function(d) { return x(d.date); })		 
+        .attr("cy", function(d) {
+            var foo = y(d.lemonde);
+            console.log("date: "+d.date+" – lemonde ("+d.lemonde+") cy: "+foo);
+            return foo;
+        })		
+        .on("mouseover", function(d) {		
+            div.transition()		
+                .duration(200)		
+                .style("opacity", .9);		
+            div	.html(formatTime(d.date) + "<br/>"  + d.lemonde)	
+                .style("left", (d3.event.pageX) + "px")		
+                .style("top", (d3.event.pageY - 28) + "px");	
+            })					
+        .on("mouseout", function(d) {		
+            div.transition()		
+                .duration(500)		
+                .style("opacity", 0);	
+        });
+    chart1.selectAll("dot")	
+        .data(data)			
+    .enter().append("circle")								
+        .attr("r", 4)
+        .style("fill", "steelblue")
+        .attr("cx", function(d) { return x(d.date); })		 
+        .attr("cy", function(d) { 
+            var foo = y(d.theguardian);
+            console.log("date: "+d.date+" – guardian ("+d.theguardian+") cy: "+foo);
+            return foo;
+        })		
+        .on("mouseover", function(d) {		
+            div_g.transition()		
+                .duration(200)		
+                .style("opacity", .9);		
+            div_g.html(formatTime(d.date) + "<br/>"  + d.theguardian)	
+                .style("left", (d3.event.pageX) + "px")		
+                .style("top", (d3.event.pageY - 28) + "px");	
+            })					
+        .on("mouseout", function(d) {		
+            div_g.transition()		
+                .duration(500)		
+                .style("opacity", 0);	
+        });
+    
+    // Add the X Axis
+    chart1.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis);
+    // Add the Y Axis
+   chart1.append("g")
+        .attr("class", "y axis")
+        .call(yAxis);
+});
+    </script>
+    
+<p class="title"><span style="color: steelblue">- </span>The Guardian</p>
+    <p class="title"> <span style="color:darkorange">- </span>Le Monde</p>
+ <br><br>
+ <div>   
+<p>
+    The peaks of the number of Le Monde articles correspond to the official communication's events: for instance, the first record 
+    of 2 articles in May 2008 (while the rest of that years the topic is simply absent) coincides with First Autism Plan 
+    initiated by French government in May 2008 (since then, there were three other “plans”); the unusual relatively high 
+    frequency between December 2011 and March 2012 corresponds to the preparation and publication of a very critical French Hight 
+    Authority of Health's report about autism; however, already in April 2012 the topic disappears, despite the fact 
+    that April is declared the month of autism awareness; indeed, there is an impression that some  “quota” exists for the 
+    topic's related titles, fixed by an idea about  the limits of audience interest for it;<br><br>
+    the overall number of peaks of number of articles about the topic is distinctively higher for The Guardian than for Le 
+    Monde, also they are much higher: the first peak (within the chosen timeline) of the number of articles about the topic 
+    in The Guardian corresponds to the UK Autism Bill of January 2009 (18 titles this month);<br><br>
+    while the peaks in visibility of the topic are present in both newspapers (with sensible numerical difference), The 
+    Guardian demonstrates the stead tendency to increase of the interest toward the topic, while Le Monde seems to up-to-date 
+    its interest regarding official declarations or the ritual 2nd of April (the international Autism Day): indeed the 
+    frequency of titles increases almost every year around this date but the graph shows clearly that since 10 years the 
+    visibility of the mental disability topic on the pages of Le Monde remains very law and barely the same.
+    </p>
+    </div>
+ 
+</body>
