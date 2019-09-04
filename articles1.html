@@ -1,0 +1,233 @@
+<html>
+  <head>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+      <style>
+    body {
+    font-family: Sans-Serif, Veranda;
+}
+          
+h1{
+margin: 15px;
+color: steelblue;
+    font-size: 18px
+          }
+.line {
+  stroke-width: 2;
+  fill: none;
+}
+.axis path {
+  stroke: black;
+}
+.text {
+  font-size: 14px;
+}
+.title-text {
+  font-size: 14px;
+}
+p{
+    margin-left: 60px;
+    margin-right: 60px;
+    font-size: 1.2em;
+    line-height: 1.6em;
+	      }
+          </style>
+  </head>
+  <body>
+<h1>Evolution of number of articles about mental/learning disability and autism in Le Monde and The Guardian newspapers</h1>
+    <div id="chart"></div>
+<script>
+var data = [
+    {
+    name: "theguardian",
+    values: [
+      {date: "2008", titles: "18"},
+      {date: "2009", titles: "45"},
+      {date: "2010", titles: "32"},
+      {date: "2011", titles: "37"},
+      {date: "2012", titles: "56"},
+      {date: "2013", titles: "60"},
+      {date: "2014", titles: "53"},
+      {date: "2015", titles: "88"},
+      {date: "2016", titles: "110"},
+      {date: "2017", titles: "83"},
+      {date: "2018", titles: "67"},
+      {date: "2019", titles: "68"}
+      
+    ]
+  },
+    
+  {
+    name: "lemonde",
+    values: [
+      {date: "2008", titles: "2"},
+      {date: "2009", titles: "3"},
+      {date: "2010", titles: "6"},
+      {date: "2011", titles: "8"},
+      {date: "2012", titles: "27"},
+      {date: "2013", titles: "15"},
+      {date: "2014", titles: "18"},
+      {date: "2015", titles: "5"},
+      {date: "2016", titles: "15"},
+      {date: "2017", titles: "10"},
+      {date: "2018", titles: "19"},
+      {date: "2019", titles: "12"}
+      
+    ]
+  }
+  
+];
+var width = 800;
+var height = 600;
+var margin = 50;
+var duration = 250;
+var lineOpacity = "0.25";
+var lineOpacityHover = "0.85";
+var otherLinesOpacityHover = "0.1";
+var lineStroke = "1.5px";
+var lineStrokeHover = "2.5px";
+var circleOpacity = '0.85';
+var circleOpacityOnLineHover = "0.25"
+var circleRadius = 3;
+var circleRadiusHover = 6;
+/* Format Data */
+var parseDate = d3.timeParse("%Y");
+data.forEach(function(d) { 
+  d.values.forEach(function(d) {
+    d.date = parseDate(d.date);
+    d.titles = +d.titles;    
+  });
+});
+/* Scale */
+var xScale = d3.scaleTime()
+  .domain(d3.extent(data[0].values, d => d.date))
+  .range([0, width-margin]);
+var yScale = d3.scaleLinear()
+  .domain([0, d3.max(data[0].values, d => d.titles)])
+  .range([height-margin, 0]);
+var color = d3.scaleOrdinal(d3.schemeCategory10);
+/* Add SVG */
+var svg = d3.select("#chart").append("svg")
+  .attr("width", (width+margin)+"px")
+  .attr("height", (height+margin)+"px")
+  .append('g')
+  .attr("transform", `translate(${margin}, ${margin})`);
+/* Add line into SVG */
+var line = d3.line()
+  .x(d => xScale(d.date))
+  .y(d => yScale(d.titles));
+let lines = svg.append('g')
+  .attr('class', 'lines');
+lines.selectAll('.line-group')
+  .data(data).enter()
+  .append('g')
+  .attr('class', 'line-group')  
+  .on("mouseover", function(d, i) {
+      svg.append("text")
+        .attr("class", "title-text")
+        .style("fill", color(i))        
+        .text(d.name)
+        .attr("text-anchor", "middle")
+        .attr("x", (width-margin)/2)
+        .attr("y", 5);
+    })
+  .on("mouseout", function(d) {
+      svg.select(".title-text").remove();
+    })
+  .append('path')
+  .attr('class', 'line')  
+  .attr('d', d => line(d.values))
+  .style('stroke', (d, i) => color(i))
+  .style('opacity', lineOpacity)
+  .on("mouseover", function(d) {
+      d3.selectAll('.line')
+					.style('opacity', otherLinesOpacityHover);
+      d3.selectAll('.circle')
+					.style('opacity', circleOpacityOnLineHover);
+      d3.select(this)
+        .style('opacity', lineOpacityHover)
+        .style("stroke-width", lineStrokeHover)
+        .style("cursor", "pointer");
+    })
+  .on("mouseout", function(d) {
+      d3.selectAll(".line")
+					.style('opacity', lineOpacity);
+      d3.selectAll('.circle')
+					.style('opacity', circleOpacity);
+      d3.select(this)
+        .style("stroke-width", lineStroke)
+        .style("cursor", "none");
+    });
+/* Add circles in the line */
+lines.selectAll("circle-group")
+  .data(data).enter()
+  .append("g")
+  .style("fill", (d, i) => color(i))
+  .selectAll("circle")
+  .data(d => d.values).enter()
+  .append("g")
+  .attr("class", "circle")  
+  .on("mouseover", function(d) {
+      d3.select(this)     
+        .style("cursor", "pointer")
+        .append("text")
+        .attr("class", "text")
+        .text(`${d.titles}`)
+        .attr("x", d => xScale(d.date) + 5)
+        .attr("y", d => yScale(d.titles) - 10);
+    })
+  .on("mouseout", function(d) {
+      d3.select(this)
+        .style("cursor", "none")  
+        .transition()
+        .duration(duration)
+        .selectAll(".text").remove();
+    })
+  .append("circle")
+  .attr("cx", d => xScale(d.date))
+  .attr("cy", d => yScale(d.titles))
+  .attr("r", circleRadius)
+  .style('opacity', circleOpacity)
+  .on("mouseover", function(d) {
+        d3.select(this)
+          .transition()
+          .duration(duration)
+          .attr("r", circleRadiusHover);
+      })
+    .on("mouseout", function(d) {
+        d3.select(this) 
+          .transition()
+          .duration(duration)
+          .attr("r", circleRadius);  
+      });
+/* Add Axis into SVG */
+var xAxis = d3.axisBottom(xScale).ticks(11);
+var yAxis = d3.axisLeft(yScale).ticks(11);
+svg.append("g")
+  .attr("class", "x axis")
+  .attr("transform", `translate(0, ${height-margin})`)
+  .call(xAxis);
+svg.append("g")
+  .attr("class", "y axis")
+  .call(yAxis)
+  .append('text')
+  .attr("y", 15)
+  .attr("transform", "rotate(-90)")
+  .attr("fill", "#000")
+  .text("total number of titles per year");
+      </script>
+<p>The number of articles for 2019 is partly provisional: by the time of this dataviz finalising (July 2019), only the 6 first month
+	data was available: that number was multied by 2.<br><br>
+	Le Monde had published the highest number of articles in 2012; in February of the same year the first of its kind 
+	report about autism was published by French Hight Authority of Health: the report criticized the use of “packing”30 
+	and generally, of psychoanalysis in the domain of autism. The debate that followed the report publication was focused 
+	as much on the psychoanalysis as on autism itself: it leans that even within the articles counted for the total 
+	number this year, the visibility was shared between the topic of autism and that, of the controversial approach 
+	France was not ready to abandon;<br><br>
+	the evolution of topic's visibility on The Guardian is much more steady and vigorous; it reaches a highest number 
+	of 110 titles in 2016 but then falls down: the explanation that Brexit usurped the visibility's space is very 
+	plausible.
+	  </p>
+	
+	
+  </body>
+</html>
