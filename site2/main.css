@@ -1,0 +1,162 @@
+:root {
+    --main:rgb(215,208,193, 0.4);
+    --secondary: #8e4836;  
+    --grey:rgb(124,148,162, 0.5);
+    --grey1:rgb(124,148,162, 0.3);
+/*    --yellow: rgb(241,193,5, 0.5);*/
+    --blue: #3f699e;
+    --black:#342f29;
+/*
+        --green: #51993D;
+        --ornage:#F64E10;
+*/
+        --black: #180E0D;
+    --header: 48px; font-weight: 600;
+    --medium: 20px;
+    --text: 14px;
+}
+
+.wrapper{
+        font-family: 'Oxygen Mono';font-size: 22px;
+        display:grid;
+    height: 100%;
+        grid-template-columns:repeat(12, 1fr);
+        grid-template-rows:repeat(12, 1fr);
+    position: relative;
+    background-color: var(--main);
+    color: var(--black);
+    
+    }
+
+.A{
+    grid-area:1/1/3/6;
+    color: var(--secondary);
+        font-size:var(--header);
+        position: relative;
+       
+}
+.A>h3{
+    font-size: var(--medium);
+   
+}
+
+.B{
+  grid-row: 4 / 10;
+  grid-column: 1 / 16;
+  position: absolute;
+    top: 20px;
+  left: -10px;
+  bottom: 40px;
+  right: 55%;
+  background: var(--grey1);
+}
+.C{
+    grid-area: 3/5/8/16;
+    background-image: url('images/fond1.png');
+    background-repeat: no-repeat;
+   
+}
+
+.link{
+    color: var(--blue);
+    font-size: var(--medium);
+}
+.F{
+    grid-area:2/7/3/8;
+    
+}
+.I{
+    grid-area: 2/9/3/10;
+}
+.J{
+    grid-area: 2/11/3/12;
+}
+
+.D{
+    grid-area: 3/1/11/10;
+    z-index: 2;
+}
+.E{
+    grid-area: 6/8/13/11;
+    font-size:var(--text); 
+    background-color: var(--grey);
+    
+}
+.E>p{
+    padding-top: 20px;
+    padding-left: 20px;
+
+}
+
+.H{
+    grid-area: 12/1/15/13;
+    z-index: 1;
+    font-size:var(--text);
+}
+
+
+#Group {
+ stroke-dasharray:1000;
+ stroke-dashoffset:1000;
+    animation: draw 3s linear forwards;
+}
+@keyframes draw {
+ to {
+ stroke-dashoffset:0;
+ }
+}
+
+.cell{
+    
+ border-radius: 5px;
+    padding: 20px;}
+
+@media only screen and (max-width: 950px){
+    .wrapper {
+        display:grid;
+        height: 100%;
+        grid-gap: 2px;
+        grid-template-columns:1fr 1fr 1fr;
+        grid-template-rows:35px 35px 35px auto;
+        
+    }
+   
+    
+.A{
+    grid-area:1/1/2/4;
+    color: var(--secondary);
+    font-size:var(--medium);
+    justify-self: center
+       }
+    .A>h3{
+        font-size:var(--text)
+        }
+    .B{display:none}
+    .C{grid-area:
+    1/1/5/4}
+    svg{width:70%;
+    margin: 0}
+    .C{display:none}
+    .E{
+        grid-area:4/1/5/4;
+        
+    }
+    .F{
+        grid-area:3/1/4/2;
+        font-size:var(--text);
+        margin: 10px;
+        justify-self: center
+    }
+    .I{
+        grid-area:3/2/4/3;
+        font-size:var(--text);
+        margin: 10px;
+        justify-self: center
+    }
+    .J{
+        grid-area:3/3/4/4;
+        font-size:var(--text);
+        margin: 10px;
+        justify-self: center
+    }
+}
