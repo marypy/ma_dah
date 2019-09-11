@@ -1,0 +1,115 @@
+html{background-color: aliceblue;}
+.wrapper{width: 100%; height: 100%;
+position:relative;}
+
+#one{
+	position: absolute;
+	top:0;
+	right:0;
+	bottom: 0;
+	left: 0;
+}
+#one{
+	z-index:1;
+	width: auto;
+	background: url("bubble1.png") no-repeat 0 0;
+	opacity:0.6;
+	animation: 12s infinite linear;
+	animation-name: bubble1 
+}
+
+#two{
+	position: absolute;
+	top:0;
+	right:200;
+	bottom: 100;
+	left: 0;
+	background: url("bubble2.png") no-repeat;
+	
+}
+#two{
+	z-index:2;
+	width: auto;
+	background: url("bubble1.png") no-repeat 0 0;
+	opacity:0.6;
+	animation: 18s infinite linear;
+	animation-name: bubble2 
+}
+
+#three{
+	position: absolute;
+	top:900;
+	right:0;
+	bottom: 0;
+	left: 600;
+	background: url("bubble3.png") no-repeat;
+	
+}
+#three{
+	z-index:-1;
+	width: auto;
+	background: url("bubble1.png") no-repeat 0 0;
+	opacity:0.6;
+	animation: 12s infinite linear;
+	animation-name: bubble3 
+}
+#four{
+	position: absolute;
+	top:3;
+	right:0;
+	bottom: 0;
+	left: 100;
+	background: url("bubble1.png") no-repeat;
+	
+}
+#four{
+	z-index:-1;
+	width: auto;
+	background: url("bubble1.png") no-repeat 0 0;
+	opacity:0.6;
+	animation: 18s infinite linear;
+	animation-name: bubble1 
+}
+#five{
+	position: absolute;
+	top:0;
+	right:700;
+	bottom: 500;
+	left: 0;
+	background: url("bubble2.png") no-repeat;
+	
+}
+#five{
+	z-index:4;
+	width: auto;
+	background: url("bubble1.png") no-repeat 0 0;
+	opacity:0.6;
+	animation: 12s infinite linear;
+	animation-name: bubble2 
+}
+
+
+@keyframes bubble1 {
+  0% { background-position: 110% 20%; }
+  33%{ background-position: 70% 35%; }
+  55% { background-position: 90% 55%; }
+  80%{ background-position: 15% 20%; }
+	100%{ background-position: 0% 10%; }
+}
+@keyframes bubble2 {
+  0% { background-position: 10% 20%; }
+  33%{ background-position: 20% 55%; }
+  55% { background-position: 90% 50%; }
+  80%{ background-position: 10% 20%; }
+	100%{ background-position: 0% 30%; }
+}
+
+@keyframes bubble3 {
+  0% { background-position: 40% 110%; }
+  33%{ background-position: 20% 70%; }
+  55% { background-position: 90% 40%; }
+  80%{ background-position: 45% 10%; }
+	100%{ background-position: 10% 0%; }
+}
+
+
