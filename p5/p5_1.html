@@ -25,14 +25,14 @@ function setup() {
 function draw() {
   var y1 = 0;
   var y2 = height/3;
-  for (var i = 0; i < width; i+=3) {
+  for (var i = 0; i < width; i+=10) {
     stroke(numbers[i]*255);
     line(i, y1, i, y2);
   }
 
   y1 = y2;
   y2 = y1 + y1;
-  for (var i = 0; i < width; i+=3) {
+  for (var i = 0; i < width; i+=15) {
     stroke(numbers[i]*255 / 4);
     line(i, y1, i, y2);
   }
